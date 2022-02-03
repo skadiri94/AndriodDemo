@@ -4,5 +4,7 @@ using UnityEngine;
 
 public interface IInteractable
 {
+  
+
     void select_toggle();
 }

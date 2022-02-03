@@ -9,6 +9,8 @@ public class GestureIdentifierScript : MonoBehaviour
     private float tap_timer;
     private bool has_moved;
     private float MAX_ALLOWED_TAP_TIME = 0.2f;
+    float starting_distance_to_selected_object;
+
 
     ITouchController[] managers;
     // Start is called before the first frame update
@@ -43,6 +45,14 @@ public class GestureIdentifierScript : MonoBehaviour
                     break;
                 case TouchPhase.Moved:
                     has_moved = true;
+                   
+
+                    if (has_moved == true)
+                    {
+                        foreach (ITouchController manager in managers)
+                            (manager as ITouchController).drag(first_touch.position);
+                       
+                    }
                     break;
 
                 case TouchPhase.Ended:

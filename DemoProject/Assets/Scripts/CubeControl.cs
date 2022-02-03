@@ -5,22 +5,23 @@ using UnityEngine;
 
 public class CubeControl : MonoBehaviour, IInteractable
 {
-    Renderer my_renderer;
+    [SerializeField, SerializeReference]
     bool is_selected = false;
+    Renderer my_renderer;
+    private Vector3 drag_position;
 
     // Start is called before the first frame update
     void Start()
     {
 
         my_renderer = GetComponent<Renderer>();
-
-
+ 
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
 
 
     }
@@ -30,7 +31,10 @@ public class CubeControl : MonoBehaviour, IInteractable
         is_selected = !is_selected;
 
         if (is_selected)
+        {
             my_renderer.material.color = Color.red;
+  
+        }
         else
             my_renderer.material.color = Color.white;
 
@@ -40,4 +44,11 @@ public class CubeControl : MonoBehaviour, IInteractable
     {
         print("Im a cube and Im OK");
     }
+
+    public void MoveTo(Vector3 destination)
+    {
+        drag_position = destination;
+        transform.position = Vector3.Lerp(transform.position, drag_position, 1.0f);
+    }
+
 }
