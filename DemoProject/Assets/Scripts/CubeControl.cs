@@ -48,7 +48,7 @@ public class CubeControl : MonoBehaviour, IInteractable
     public void MoveTo(Vector3 destination)
     {
         drag_position = destination;
-        transform.position = Vector3.Lerp(transform.position, drag_position, 1.0f);
+        transform.position = Vector3.Lerp(transform.position, drag_position, 0.5f);
     }
 
 }
