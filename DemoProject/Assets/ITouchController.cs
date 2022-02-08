@@ -6,6 +6,10 @@ public interface ITouchController
 
     void drag(Vector2 current_position);
 
+    void dragEnd();
+
     void pinch(Vector2 position_1, Vector2 position_2, float relative_distance);
+
+ 
 
 }
