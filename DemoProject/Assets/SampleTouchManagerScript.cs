@@ -7,7 +7,7 @@ public class SampleTouchManagerScript : MonoBehaviour, ITouchController
 
 
     IInteractable selected_object;
-    float starting_distance_to_selected_object;
+    //float starting_distance_to_selected_object;
     bool drag_started = false;
     public void drag(Vector2 current_position)
     {
@@ -22,20 +22,25 @@ public class SampleTouchManagerScript : MonoBehaviour, ITouchController
 
             if (!drag_started)
             {
-
-                starting_distance_to_selected_object = Vector3.Distance(Camera.main.transform.position, (selected_object as MonoBehaviour).transform.position);
+                selected_object.drag_start();
+               // starting_distance_to_selected_object = Vector3.Distance(Camera.main.transform.position, (selected_object as MonoBehaviour).transform.position);
                 drag_started = true;
             }
 
-            Ray new_positional_ray = Camera.main.ScreenPointToRay(current_position);
+            selected_object.drag_update(ourRay);
 
-            { (selected_object as CubeControl).MoveTo(new_positional_ray.GetPoint(starting_distance_to_selected_object)); }
+            //{ (selected_object as CubeControl).MoveTo(new_positional_ray.GetPoint(starting_distance_to_selected_object)); }
 
         }
 
 
 
    }
+
+    public void dragEnd()
+    {
+        drag_started = false;
+    }
 
     public void pinch(Vector2 position_1, Vector2 position_2, float relative_distance)
     {

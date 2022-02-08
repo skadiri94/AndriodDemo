@@ -32,4 +32,13 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
 
     }
 
+    public void drag_start()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void drag_update(Ray r)
+    {
+        throw new System.NotImplementedException();
+    }
 }

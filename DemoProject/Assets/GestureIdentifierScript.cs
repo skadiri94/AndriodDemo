@@ -61,6 +61,10 @@ public class GestureIdentifierScript : MonoBehaviour
                         foreach (ITouchController manager in managers)
                             (manager as ITouchController).tap(first_touch.position);
                     }
+
+                    foreach (ITouchController manager in managers)
+                        (manager as ITouchController).dragEnd();
+
                     break;
 
             }
