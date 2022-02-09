@@ -8,7 +8,6 @@ public class CubeControl : MonoBehaviour, IInteractable
    
     bool is_selected = false;
     Renderer my_renderer;
-    private Vector3 drag_position;
     float distance;
     //for moving at a constant direction
     //float speed = 10.0f;
@@ -68,12 +67,22 @@ public class CubeControl : MonoBehaviour, IInteractable
 
     public void drag_start()
     {
-        distance = Vector3.Distance(transform.position, Camera.main.transform.position);
+       // distance = Vector3.Distance(transform.position, Camera.main.transform.position);
     }
 
     public void drag_update(Ray r)
     {
-        transform.position = r.GetPoint(distance);
+        RaycastHit info;
+
+        if (Physics.Raycast(r, out info))
+        {
+
+            if (info.transform && is_selected == true)
+            {
+                Vector3 plane_hit = info.point;
+                transform.position = plane_hit;
+            }
+        }
     }
 
 
