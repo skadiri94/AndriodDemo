@@ -46,10 +46,14 @@ public class CubeControl : MonoBehaviour, IInteractable
         if (is_selected)
         {
             my_renderer.material.color = Color.red;
-  
+            gameObject.layer = 2;
         }
+
         else
+        {
             my_renderer.material.color = Color.white;
+            gameObject.layer = 0;
+        }
 
     }
 
@@ -79,11 +83,14 @@ public class CubeControl : MonoBehaviour, IInteractable
 
             if (info.transform && is_selected == true)
             {
-                Vector3 plane_hit = info.point;
-                transform.position = plane_hit;
+               
+                transform.position = info.point + info.normal*0.5f;
             }
         }
     }
 
-
+    public void drag_ended()
+    {
+        //drag_started = false;
+    }
 }
