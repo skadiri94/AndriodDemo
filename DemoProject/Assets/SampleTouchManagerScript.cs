@@ -40,6 +40,10 @@ public class SampleTouchManagerScript : MonoBehaviour, ITouchController
     public void dragEnd()
     {
         drag_started = false;
+      if (selected_object != null)
+        {
+            selected_object.drag_ended();
+        }
     }
 
     public void pinch(Vector2 position_1, Vector2 position_2, float relative_distance)

@@ -45,4 +45,9 @@ public class SphereControlScript : MonoBehaviour, IInteractable
         else
             my_renderer.material.color = Color.white;
     }
+
+    public void drag_ended()
+    {
+     
+    }
 }

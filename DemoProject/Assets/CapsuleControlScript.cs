@@ -16,11 +16,6 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
     {
 
         my_renderer = GetComponent<Renderer>();
-        ourCameraPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        ourCameraPlane.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, transform.position.z);
-        ourCameraPlane.transform.up = (Camera.main.transform.position - ourCameraPlane.transform.position).normalized;
-        Color newColor = new Color(0, 0, 0, 0f);
-        ourCameraPlane.GetComponent<Renderer>().material.color = newColor;
 
 
 
@@ -38,14 +33,25 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
         is_selected = !is_selected;
 
         if (is_selected)
+        {
             my_renderer.material.color = Color.blue;
+            gameObject.layer = 2;
+        }
+
         else
+        {
             my_renderer.material.color = Color.white;
+            gameObject.layer = 0;
+        }
     }
 
     public void drag_start()
     {
-    
+  
+        ourCameraPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        ourCameraPlane.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, transform.position.z);
+        ourCameraPlane.transform.up = (Camera.main.transform.position - ourCameraPlane.transform.position).normalized;
+        ourCameraPlane.GetComponent<Renderer>().enabled = false;
     }
 
     public void drag_update(Ray r)
@@ -63,4 +69,8 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
         }
     }
 
+    public void drag_ended()
+    {
+        Destroy(ourCameraPlane);
+    }
 }
