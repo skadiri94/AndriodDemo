@@ -8,7 +8,7 @@ public class CubeControl : MonoBehaviour, IInteractable
    
     bool is_selected = false;
     Renderer my_renderer;
-    int layer_mask;
+    LayerMask mask;
     //for moving at a constant direction
     //float speed = 10.0f;
 
@@ -17,7 +17,7 @@ public class CubeControl : MonoBehaviour, IInteractable
     {
 
         my_renderer = GetComponent<Renderer>();
-        layer_mask = 8;
+        mask = LayerMask.GetMask("Ground");
         // drag_position = transform.position;
 
     }
@@ -79,7 +79,7 @@ public class CubeControl : MonoBehaviour, IInteractable
     {
         RaycastHit info;
 
-        if (Physics.Raycast(r, out info, layer_mask))
+        if (Physics.Raycast(r, out info,1000.0f, (int)mask))
         {
                 transform.position = info.point + info.normal*0.5f;
            
