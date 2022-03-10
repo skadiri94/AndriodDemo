@@ -9,5 +9,6 @@ public interface IInteractable
     void drag_ended();
     void select_toggle();
     void drag_update(Ray r);
-    
+    GameObject gameObject { get; }
+
 }

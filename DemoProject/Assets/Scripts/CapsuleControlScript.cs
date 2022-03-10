@@ -9,15 +9,15 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
     bool is_selected = false;
     Renderer my_renderer;
     GameObject ourCameraPlane;
- 
+    
+    
 
     //Start is called before the first frame update
     void Start()
     {
 
         my_renderer = GetComponent<Renderer>();
-
-
+       
 
     }
 
@@ -73,4 +73,6 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
     {
         Destroy(ourCameraPlane);
     }
+
+
 }

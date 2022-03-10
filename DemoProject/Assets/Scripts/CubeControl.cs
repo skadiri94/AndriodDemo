@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CubeControl : MonoBehaviour, IInteractable
 {
-   
+
     bool is_selected = false;
     Renderer my_renderer;
     LayerMask mask;
@@ -25,7 +25,7 @@ public class CubeControl : MonoBehaviour, IInteractable
     // Update is called once per frame
     void Update()
     {
-      // transform.position = Vector3.Lerp(transform.position, drag_position, 0.5f);
+        // transform.position = Vector3.Lerp(transform.position, drag_position, 0.5f);
         //for moving at a constant direction
         /*  if(Vector3.Distance(drag_position,transform.position) < 0.05f)
           {
@@ -72,22 +72,27 @@ public class CubeControl : MonoBehaviour, IInteractable
 
     public void drag_start()
     {
-       // distance = Vector3.Distance(transform.position, Camera.main.transform.position);
+        // distance = Vector3.Distance(transform.position, Camera.main.transform.position);
     }
 
     public void drag_update(Ray r)
     {
         RaycastHit info;
 
-        if (Physics.Raycast(r, out info,1000.0f, (int)mask))
+        if (Physics.Raycast(r, out info, 1000.0f, (int)mask))
         {
-                transform.position = info.point + info.normal*0.5f;
-           
+            transform.position = info.point + info.normal * 0.5f;
+
         }
     }
 
     public void drag_ended()
     {
         //drag_started = false;
+    }
+
+    public void TwoFingerRotationLeftRight(Vector3 rotation)
+    {
+        gameObject.transform.Rotate(rotation, Space.Self);
     }
 }
