@@ -17,12 +17,11 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
     CameraControl my_camera;
     Vector2 startingDragPos;
 
-    bool twoFinDrag = false;
+    bool towFingerDragStarted = false;
     bool drag_started = false;
     private bool pinchStarted;
 
     bool rotate_started = false;
-    private Vector3 startingCameraPos;
 
     //CameraControl my_camera;
 
@@ -65,7 +64,7 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
     public void dragEnd()
     {
         drag_started = false;
-        twoFinDrag = false;
+        towFingerDragStarted = false;
       if (selected_object != null)
         {
             selected_object.drag_ended();
@@ -211,22 +210,21 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
         }
     }
 
+
     public void twoFDrag(Vector2 p)
     {
         if (selected_object == null)
         {
 
-            if (!twoFinDrag) {
-                twoFinDrag = true;
+            if (!towFingerDragStarted)
+            {
+                towFingerDragStarted = true;
                 my_camera.twoFDragStart();
 
             }
-            else
-            {
 
-                my_camera.twoFingerDrag(p);
-
-            }
+            my_camera.twoFingerDrag(p);
+         
 
         }
     }

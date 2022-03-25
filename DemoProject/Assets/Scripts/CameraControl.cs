@@ -68,22 +68,22 @@ public class CameraControl : MonoBehaviour
         theta = 90 - 180 * p.x / Screen.width;
         phi *= Mathf.Deg2Rad;
         theta *= Mathf.Deg2Rad;
-     
-        Vector3 v = new Vector3(p.x / Screen.width, p.y / Screen.height, 1.0f);
 
         dir = new Vector3(Mathf.Cos(theta) * Mathf.Sin(phi), Mathf.Cos(phi), Mathf.Sin(theta) * Mathf.Sin(phi));
 
-        transform.LookAt(transform.position+ dir);
-
         
-      
+        transform.rotation = Quaternion.LookRotation(dir) * init_Orientation;
+       
+
+
     }
 
 
 
     public void twoFDragStart()
     {
-        dir = transform.InverseTransformPoint(dir);
+       
+        init_Orientation = transform.rotation;
     }
 
     internal void startShake()

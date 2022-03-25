@@ -187,6 +187,7 @@ public class GestureIdentifierScript : MonoBehaviour
                 //one method for all ended.
                 (manager as ITouchController).pinchEnded();
                 (manager as ITouchController).rotatedEnded();
+               
             }
 
         }
