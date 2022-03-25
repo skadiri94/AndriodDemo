@@ -17,6 +17,7 @@ public class CapsuleControlScript : MonoBehaviour, IInteractable
     {
 
         my_renderer = GetComponent<Renderer>();
+
        
 
     }

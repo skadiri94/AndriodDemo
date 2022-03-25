@@ -5,9 +5,10 @@ using System.Linq;
 
 public class GestureIdentifierScript : MonoBehaviour
 {
-
-    private float tap_timer;
-    private bool has_moved;
+    enum idMode { determiningGesture,lockedToPinch, lockedToRotate, lockedToTwoFDrag, lockedToPress, lockedToDrag }
+    idMode isCurrently = idMode.determiningGesture;
+    private float tapTimer;
+    private bool hasMoved, isStationed;
     private float MAX_ALLOWED_TAP_TIME = 0.2f;
     public bool cameraZoomPinch;
 
@@ -17,18 +18,11 @@ public class GestureIdentifierScript : MonoBehaviour
     float startingDistance;
 
     //rotate
- 
-    private float startingAngle = 0;
-    
+    private float startingAngle = 0; 
     private float newAngle = 0;
 
-    //camera zooming
-    private float zoomOutMinValue = 4.5f;
-    private float zoomOutMaxValue = 12;
- 
-
-
     ITouchController[] managers;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,10 +31,6 @@ public class GestureIdentifierScript : MonoBehaviour
 
     }
 
-    public void cameraZoomInorOut(float incrementValue)
-    {
-        Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - incrementValue, zoomOutMinValue, zoomOutMaxValue);
-    }
 
     // Update is called once per frame
     void Update()
@@ -48,39 +38,61 @@ public class GestureIdentifierScript : MonoBehaviour
 
         if (Input.touchCount == 1)
         {
-            tap_timer += Time.deltaTime;
-            Touch[] all_touches = Input.touches;
-            Touch first_touch = all_touches[0];
-            print(first_touch.phase);
+            tapTimer += Time.deltaTime;
+            Touch[] allTouches = Input.touches;
+            Touch firstTouch = allTouches[0];
+            print(firstTouch.phase);
 
-            switch (first_touch.phase)
+            switch (firstTouch.phase)
             {
                 case TouchPhase.Began:
-                    tap_timer = 0f;
-                    has_moved = false;
+                    tapTimer = 0f;
+                    hasMoved = false;
 
                     break;
                 case TouchPhase.Stationary:
-
-
+                    if (tapTimer > 1.5f)
+                    {
+                        isCurrently = idMode.lockedToPress;
+                        if (isCurrently == idMode.lockedToPress)
+                        {
+                            foreach (ITouchController manager in managers)
+                                (manager as ITouchController).press();
+                        }
+                    }
                     break;
                 case TouchPhase.Moved:
-                    has_moved = true;
-                   
 
-                    if (has_moved == true)
+                 
+                    isCurrently = idMode.lockedToDrag;
+                    foreach (ITouchController manager in managers)
+                    {
+                        (manager as ITouchController).endPress();
+
+                    }
+
+
+
+                    if (isCurrently == idMode.lockedToDrag)
                     {
                         foreach (ITouchController manager in managers)
-                            (manager as ITouchController).drag(first_touch.position);
+                            (manager as ITouchController).drag(firstTouch.position);
                        
                     }
                     break;
 
                 case TouchPhase.Ended:
-                    if ((tap_timer < MAX_ALLOWED_TAP_TIME) && !has_moved)
+
+                    isCurrently = idMode.determiningGesture;
+                    foreach (ITouchController manager in managers)
+                        (manager as ITouchController).endPress();
+                
+                    if ((tapTimer < MAX_ALLOWED_TAP_TIME) && !hasMoved)
                     {
+                     
+
                         foreach (ITouchController manager in managers)
-                            (manager as ITouchController).tap(first_touch.position);
+                            (manager as ITouchController).tap(firstTouch.position);
                     }
 
                     foreach (ITouchController manager in managers)
@@ -97,55 +109,85 @@ public class GestureIdentifierScript : MonoBehaviour
         {
             Touch[] all_touches = Input.touches;
             Touch first_touch = all_touches[0];
-            Touch second_touch = all_touches[1];
+            Touch secondTouch = all_touches[1];
 
 
-
-
-            switch (second_touch.phase)
+            switch (secondTouch.phase)
             {
                 case TouchPhase.Began:
 
-                    startingAveragePos = ((first_touch.position + second_touch.position) / 2);
-                    startingDistance = Vector2.Distance(second_touch.position, first_touch.position);
-                    startingAngle = Mathf.Atan2(second_touch.position.y - first_touch.position.y, second_touch.position.x - first_touch.position.x) * Mathf.Rad2Deg; 
-                    has_moved = false;
+                    startingAveragePos = ((first_touch.position + secondTouch.position) / 2);         
+                    startingDistance = Vector2.Distance(secondTouch.position, first_touch.position);
+                    startingAngle = Mathf.Atan2(secondTouch.position.y - first_touch.position.y, secondTouch.position.x - first_touch.position.x) * Mathf.Rad2Deg; 
+                    hasMoved = false;
                     break;
                 case TouchPhase.Stationary:
 
 
                     break;
                 case TouchPhase.Moved:
-                    has_moved = true;
-                    Vector2 currentAvgPos = ((first_touch.position + second_touch.position) / 2);
-                    float endDistance = Vector2.Distance(first_touch.position, second_touch.position);
+                    hasMoved = true;
+                    Vector2 currentAvgPos = ((first_touch.position + secondTouch.position) / 2);
+                    float endDistance = Vector2.Distance(first_touch.position, secondTouch.position);
                     float relDistance = endDistance / startingDistance;
-                    newAngle = Mathf.Atan2((second_touch.position.y - first_touch.position.y), (second_touch.position.x - first_touch.position.x)) * Mathf.Rad2Deg;
+                    newAngle = Mathf.Atan2((secondTouch.position.y - first_touch.position.y), (secondTouch.position.x - first_touch.position.x)) * Mathf.Rad2Deg;
 
-
-                    if (has_moved)
+                    switch (isCurrently)
                     {
-                        foreach (ITouchController manager in managers)
-                        {
-                            (manager as ITouchController).pinch(startingDistance, endDistance, relDistance);
-                            (manager as ITouchController).rotate(newAngle - startingAngle);
-                            (manager as ITouchController).twoFDrag(currentAvgPos - startingAveragePos);
-                        }
+
+                        case idMode.determiningGesture:
+
+                            if (Mathf.Abs(newAngle - startingAngle) > 5)
+                                isCurrently = idMode.lockedToRotate;
+                            else if (Mathf.Abs(relDistance - 1) > 0.2f)
+                                isCurrently = idMode.lockedToPinch;
+                            else
+                                if (Vector2.Distance(startingAveragePos, currentAvgPos) > 70)
+                                isCurrently = idMode.lockedToTwoFDrag;
+                            if (isCurrently != idMode.determiningGesture) print(isCurrently);
+                            break;
+
+
+                        case idMode.lockedToRotate:
+
+                            foreach (ITouchController manager in managers)
+                                (manager as ITouchController).rotate(newAngle - startingAngle);
+
+                            break;
+
+
+                        case idMode.lockedToPinch:
+                            foreach (ITouchController manager in managers)
+                                (manager as ITouchController).pinch(startingDistance, endDistance, relDistance);
+                            break;
+                        case idMode.lockedToTwoFDrag:
+                            foreach (ITouchController manager in managers)
+                                (manager as ITouchController).twoFDrag(currentAvgPos - startingAveragePos);
+                            break;
+
 
                     }
+
                     break;
 
-                case TouchPhase.Ended:
 
+                case TouchPhase.Ended:
+                    isCurrently = idMode.determiningGesture;
+                    foreach (ITouchController manager in managers)
+                        (manager as ITouchController).dragEnd();
                     break;
 
             }
    
         }
         else
-        { 
+        {
             foreach (ITouchController manager in managers)
+            {
+                //one method for all ended.
                 (manager as ITouchController).pinchEnded();
+                (manager as ITouchController).rotatedEnded();
+            }
 
         }
 

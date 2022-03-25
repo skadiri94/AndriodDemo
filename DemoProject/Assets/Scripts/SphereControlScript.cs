@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class SphereControlScript : MonoBehaviour, IInteractable
 {
-    bool is_selected = false;
-    Renderer my_renderer;
-    GameObject ourCameraPlane;
-    Vector3 drag_position;
+    bool isSelected = false;
+    Renderer myRenderer;
+    Vector3 dragPosition;
     float distance;
 
     // Start is called before the first frame update
     void Start()
     {
-        my_renderer = GetComponent<Renderer>();
+        myRenderer = GetComponent<Renderer>();
+        dragPosition = transform.position;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.position = Vector3.Lerp(transform.position,drag_position, 0.5f);
+        transform.position = Vector3.Lerp(transform.position,dragPosition, 0.5f);
     }
 
     public void drag_start()
@@ -30,20 +30,20 @@ public class SphereControlScript : MonoBehaviour, IInteractable
 
     public void drag_update(Ray r)
     {
-        drag_position = r.GetPoint(distance);
+        dragPosition = r.GetPoint(distance);
     }
 
     public void select_toggle()
     {
-        is_selected = !is_selected;
+        isSelected = !isSelected;
 
-        if (is_selected)
+        if (isSelected)
         {
-            my_renderer.material.color = Color.green;
+            myRenderer.material.color = Color.green;
 
         }
         else
-            my_renderer.material.color = Color.white;
+            myRenderer.material.color = Color.white;
     }
 
     public void drag_ended()

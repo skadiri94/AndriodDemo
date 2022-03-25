@@ -4,18 +4,26 @@ using UnityEngine;
 
 public class TouchManagerScript : MonoBehaviour, ITouchController
 {
-
+    //Press
+    float speed = 100.0f; //how fast it shakes
+    float amount = 0.02f; //how much it shakes
+    Vector3 startPos;
+    bool pressStart = false;
 
     IInteractable selected_object;
     Quaternion startOrientation;
     Vector3 scale;
-    Quaternion cameraStartingOrientation;
+ 
+    CameraControl my_camera;
+    Vector2 startingDragPos;
 
     bool twoFinDrag = false;
     bool drag_started = false;
     private bool pinchStarted;
 
     bool rotate_started = false;
+    private Vector3 startingCameraPos;
+
     //CameraControl my_camera;
 
     public void drag(Vector2 current_position)
@@ -39,17 +47,39 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
 
         }
 
+        else
+        {
+            if (!drag_started)
+            {
+                startingDragPos = current_position;
+                drag_started = true;
+            }
+            my_camera.get_dragged(current_position - startingDragPos);
+            startingDragPos = current_position;
+        }
 
 
-   }
+
+    }
 
     public void dragEnd()
     {
         drag_started = false;
+        twoFinDrag = false;
       if (selected_object != null)
         {
             selected_object.drag_ended();
         }
+    }
+
+    public void endGestures()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void endPress()
+    {
+        pressStart = false;
     }
 
     public void pinch(float startDist, float endDist, float relativeDistance)
@@ -59,23 +89,27 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
         {
             if (selected_object != null)
             {
-                startOrientation = selected_object.gameObject.transform.rotation;
+                
                 scale = selected_object.gameObject.transform.localScale;
             }
             else
             {
-                startOrientation = Camera.main.transform.rotation;
+              
+                my_camera.pinch_start();
+              
             }
             pinchStarted = true;
         }
         else
         {
-            if(selected_object != null)
+            if (selected_object != null)
             {
                 selected_object.gameObject.transform.localScale = scale * relativeDistance;
             }
             else
-                Camera.main.transform.position += ((endDist - startDist)/ 1000) * transform.forward;
+             
+                my_camera.pinch(startDist, endDist);
+            
         }
      
        
@@ -86,6 +120,34 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
         pinchStarted = false;
     }
 
+//Touching surface for extended period of time.
+    public void press()
+    {
+
+        if (selected_object != null)
+        {
+            if (!pressStart) { 
+            startPos = selected_object.gameObject.transform.position;
+            pressStart = true;
+
+        }
+            startPos.x = startPos.x + (Mathf.Sin(Time.time * speed) * amount);
+            startPos.y = startPos.y + (Mathf.Sin(Time.time * speed) * amount);
+            selected_object.gameObject.transform.position = new Vector3(startPos.x,startPos.y, startPos.z);
+          
+        }
+        else
+        {
+            if (!pressStart)
+            {
+                my_camera.startShake();
+                drag_started = true;
+            }
+            my_camera.shakeCam();
+            
+        }
+    }
+
     public void rotate(float angle)
     {
         if (selected_object != null)
@@ -93,20 +155,22 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
             if (!rotate_started)
             {
                 //selected_object.rotate_start();
+                startOrientation = selected_object.gameObject.transform.rotation;
                 rotate_started = true;
             }
-            selected_object.gameObject.transform.rotation = startOrientation* Quaternion.AngleAxis(angle, Camera.main.transform.forward);
+            selected_object.gameObject.transform.rotation = startOrientation * Quaternion.AngleAxis(angle, Camera.main.transform.forward);
         }
 
         else
         {
             if (!rotate_started)
             {
-                //my_camera.rotate_start();
+                my_camera.rotate_start();
                 rotate_started = true;
             }
             else
-                Camera.main.transform.rotation = startOrientation * Quaternion.AngleAxis(-angle, Camera.main.transform.forward);
+                my_camera.rotate(angle);
+                
         }
     }
 
@@ -154,12 +218,14 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
 
             if (!twoFinDrag) {
                 twoFinDrag = true;
+                my_camera.twoFDragStart();
 
-                cameraStartingOrientation = Camera.main.transform.rotation;
             }
             else
             {
-                Camera.main.transform.rotation = Quaternion.AngleAxis(p.x, Camera.main.transform.up) * cameraStartingOrientation;
+
+                my_camera.twoFingerDrag(p);
+
             }
 
         }
@@ -168,7 +234,7 @@ public class TouchManagerScript : MonoBehaviour, ITouchController
     // Start is called before the first frame update
     void Start()
     {
-
+        my_camera = Camera.main.GetComponent<CameraControl>();
     }
 
     // Update is called once per frame
