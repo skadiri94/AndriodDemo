@@ -17,3 +17,5 @@ Rotate - rotates a selected object or the camera if non is selected.
 Two fingers drag - Rotates the camera in a fixed position to either up/down or left/right.
 Press - If an object is selected and the finger held for a couple of seconds, the object starts shaking, or the camera starts shaking if no object is selected.
 Reset Button - Resets the Scene.
+
+Note: to get a green grass effect for the plane you need to have a Resources folder in the Assests directory with the Grass.mat file in it.
